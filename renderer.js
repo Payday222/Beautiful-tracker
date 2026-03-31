@@ -17,18 +17,10 @@ const lineChart = new Chart(lineCtx, {
     data: {
         labels: [], // timestamps
         datasets: [],
-        borderColor: "#4fc3f7",
-        backgroundColor: "rgba(79, 195, 247, 0.2)",
-        tension: 0.3
     },
     options: {
         responsive: true,
-        plugins: { legend: 
-            {   display: true,
-                labels: {
-                    color: "#ffffff"
-                }
-             } },
+        plugins: { legend: { display: true } },
              
     }
 });
