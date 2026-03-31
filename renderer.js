@@ -15,12 +15,7 @@ const lineChart = new Chart(lineCtx, {
     type: "line",
     data: {
         labels: [], // timestamps
-        datasets: [{
-            label: "Activity duration",
-            data: [],
-            borderColor: "blue",
-            fill: false
-        }]
+        datasets: []
     },
     options: {
         responsive: true,
@@ -42,6 +37,31 @@ const pieChart = new Chart(pieCtx, {
 });
 
 window.api.onUsageData((data) => {
+const now = new Date().toLocaleTimeString();
+
+lineChart.data.labels.push(now);
+
+Object.entries(data).forEach(([name, value]) => {
+    let ds = lineChart.data.datasets.find(d => d.label === name);
+
+    if(!ds) {
+        ds = {
+        label: name,
+        data: [],
+        borderColor: getRandomColor(),
+        fill: false
+        };
+        lineChart.data.datasets.push(ds);
+    }
+    ds.data.push(value);
+});
+
+if(lineChart.data.labels.length > 300) {
+    lineChart.data.labels.shift();
+    lineChart.data.datasets.forEach(ds => ds.data.shift);
+}
+lineChart.update();
+
   const labels = Object.keys(data);
   const values = Object.values(data);
   const backgroundColors = [];

@@ -1,6 +1,7 @@
 const { exec } = require("child_process");
 
 const windowHistory = [];
+const topTen = [];
 
 function endPreviousWindow() {
   const last = windowHistory[windowHistory.length - 1];
@@ -50,5 +51,6 @@ function start(callback) {
     callback(stats);
   }, 1000);
 }
+
 
 module.exports = { start };
