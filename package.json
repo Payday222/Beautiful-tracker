@@ -1,14 +1,33 @@
 {
   "name": "activity-tracker",
   "version": "1.0.0",
+  "description": "Cross platform activity tracker",
+  "author": "Michal Kaliszuk",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "9.2.0"
+    "electron": "9.2.0",
+    "electron-builder": "^26.8.1"
   },
   "dependencies": {
     "chartjs-chart-treemap": "^3.1.0"
+  },
+  "build": {
+    "appId": "com.michal.activitytracker",
+    "productName": "ActivityTracker",
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility"
+    },
+      "mac": {
+    "target": "dmg",
+    "category": "public.app-category.utilities"
+  },
+
+  "win": {
+    "target": "nsis"
+  }
   }
 }
