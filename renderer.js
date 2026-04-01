@@ -6,6 +6,7 @@
 // ELEMENT REFERENCES
 // ----------------------
 const pieColors = {};
+const treemapColors = {};
 const lineCtx = document.getElementById("lineChart").getContext("2d");
 const pieCtx = document.getElementById("pieChart").getContext("2d");
 const historyCtx = document.getElementById("historyChart").getContext("2d");
@@ -18,13 +19,25 @@ const useTimeDisplay = document.getElementById("usetime-display");
 // UTILITIES
 // ----------------------
 function getRandomColor() {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = 65 + Math.random() * 10; // 65–75%
+  const lightness = 45 + Math.random() * 10;  // 45–55%
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
+function getLineColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 45%, 65%)`;
+}
+function getPieColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 75%, 45%)`;
+}
+function getTreemapColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 50%, 85%)`;
+}
+
+
 
 function formatTime(seconds) {
   seconds = Math.floor(seconds);
@@ -94,7 +107,13 @@ const pieChart = new Chart(pieCtx, {
     }]
   },
   options: {
-    responsive: true,
+    responsive: false,
+    maintainAspectRatio: true,
+    layout: {
+      padding: {
+        right: 100
+      }
+    },
     plugins: {
       legend: {
         position: "bottom",
@@ -125,8 +144,8 @@ const historyChart = new Chart(historyCtx, {
   if (!raw) return "#444"; 
 
   const name = raw.name;
-  if (!pieColors[name]) pieColors[name] = getRandomColor();
-  return pieColors[name];
+  if (!treemapColors[name]) treemapColors[name] = getTreemapColor();
+  return treemapColors[name];
 },
 
       borderColor: "#1e1e1e",
@@ -224,7 +243,7 @@ window.api.onUsageData((data) => {
         fullName: name,
         label: truncateLabel(name),
         data: [],
-        borderColor: getRandomColor(),
+        borderColor: getLineColor(),
         fill: false
       };
       lineChart.data.datasets.push(ds);
@@ -245,7 +264,7 @@ window.api.onUsageData((data) => {
   const values = Object.values(data);
 
   const backgroundColors = labels.map(name => {
-    if (!pieColors[name]) pieColors[name] = getRandomColor();
+    if (!pieColors[name]) pieColors[name] = getPieColor();
     return pieColors[name];
   });
 
