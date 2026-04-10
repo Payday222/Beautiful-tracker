@@ -95,6 +95,86 @@
 #raw-data-table tr:hover td {
   background: #3a3a3a;
 }
+.dropdown-section {
+  margin-top: 20px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  background: #222;
+  color: #eee;
+  padding: 10px 15px;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown-toggle:hover {
+  background: #2a2a2a;
+}
+
+.dropdown-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease-out;
+  background: #1a1a1a;
+  padding: 0 10px;
+}
+
+.dropdown-content.open {
+  max-height: 800px;
+  padding: 10px;
+}
+#weeklyChart {
+  height: 400px;
+}
+.weekly-label {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px; /* adjust if needed */
+  display: inline-block;
+}
+#weeklyTopTenList {
+  list-style: none;
+  padding: 0;
+  margin-top: 15px;
+}
+
+#weeklyTopTenList li {
+  background: #2a2a2a;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+#weeklyTopTenList li:hover {
+  background: #333;
+}
+
+.weekly-app-name {
+  font-weight: 500;
+}
+
+.weekly-app-time {
+  font-weight: 600;
+  color: #4fc3f7;
+}
+#weeklyChartWrapper {
+  max-height: 400px;   
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
 
 </style>
 
@@ -131,7 +211,44 @@
 </table>
 <h2>Today's History</h2>
 <canvas id="historyChart" width="600" height="400"></canvas>
+<button class="dropdown-toggle" id="weeklyToggle">Weekly History ▼</button>
 
+<div class="dropdown-content" id="weeklyContent">
+
+  <div id="weeklyChartWrapper">
+    <canvas id="weeklyChart"></canvas>
+  </div>
+
+  <h3>Top 10 This Week</h3>
+  <ul id="weeklyTopTenList"></ul>
+
+</div>
+
+</div>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+  const weeklyToggle = document.getElementById("weeklyToggle");
+  const weeklyContent = document.getElementById("weeklyContent");
+
+ weeklyToggle.addEventListener("click", () => {
+  weeklyContent.classList.toggle("open");
+
+  if (weeklyContent.classList.contains("open")) {
+    weeklyToggle.textContent = "Weekly History ▲";
+
+    setTimeout(() => {
+      weeklyChart.resize();
+      weeklyChart.update();
+    }, 50);
+  } else {
+    weeklyToggle.textContent = "Weekly History ▼";
+  }
+});
+
+});
+
+</script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

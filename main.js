@@ -32,6 +32,12 @@ function createWindow() {
     }
   }, 1000);
 }
+setInterval(() => {
+  const { weeklyHistoryTotals, labels, data } = historyTracker.calculateWeeklyHistory();
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("weekly-history", { labels, data });
+  }
+}, 5000);
 
 
 app.whenReady().then(() => {

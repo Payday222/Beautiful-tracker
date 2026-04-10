@@ -54,6 +54,20 @@ function formatTime(seconds) {
 function truncateLabel(name, max = 25) {
   return name.length > max ? name.slice(0, max) + "…" : name;
 }
+function smartLabel(name, max = 25) {
+  let clean = String(name || "");
+
+  clean = clean.replace(/ and \d+ more pages - Personal - Microsoft.*$/i, "");
+  clean = clean.replace(/ - Visual Studio Code$/i, "");
+  clean = clean.replace(/ \| Messenger$/i, "");
+  clean = clean.replace(/\.pdf$/i, "");
+  clean = clean.replace(/Użytkownik .* wysłał wiadomość.*$/i, "Messenger");
+
+  clean = clean.trim();
+
+  return clean.length > max ? clean.slice(0, max) + "…" : clean;
+}
+
 
 
 // ----------------------
@@ -299,3 +313,119 @@ window.api.onTodayHistory((totals) => {
   historyChart.data.datasets[0].tree = treeData;
   historyChart.update();
 });
+
+//----------------------
+// WEEKLY
+//----------------------
+
+window.api.onWeeklyHistory((payload) => {
+  const count = payload.labels.length;
+
+  const height = Math.max(200, count * 30);
+  const canvas = document.getElementById("weeklyChart");
+  canvas.style.height = height + "px";
+
+  console.log("WEEKLY PAYLOAD:", payload);
+  console.log("LABEL COUNT:", payload?.labels?.length);
+  console.log("DATA COUNT:", payload?.data?.length);
+
+  if (!payload || !payload.labels || !payload.data) return;
+
+  const { labels, data } = payload;
+
+  const backgroundColors = labels.map(name => {
+    if (!pieColors[name]) pieColors[name] = getPieColor();
+    return pieColors[name];
+  });
+
+  const truncatedLabels = labels.map(name => truncateLabel(name, 25));
+
+  weeklyChart.data.labels = truncatedLabels;
+  weeklyChart.data.datasets[0].data = data;
+  weeklyChart.data.datasets[0].backgroundColor = backgroundColors;
+
+  weeklyChart.update();
+  // -----------------------------
+// WEEKLY TOP 10 LIST
+// -----------------------------
+const weeklyList = document.getElementById("weeklyTopTenList");
+weeklyList.innerHTML = "";
+
+const combined = labels.map((name, i) => ({
+  name,
+  time: data[i]
+}));
+
+combined.sort((a, b) => b.time - a.time);
+
+const topTen = combined.slice(0, 10);
+
+topTen.forEach(item => {
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <span class="weekly-app-name">${truncateLabel(item.name, 30)}</span>
+    <span class="weekly-app-time">${formatTime(item.time)} min</span>
+  `;
+  weeklyList.appendChild(li);
+});
+
+});
+
+const weeklyCtx = document.getElementById("weeklyChart").getContext("2d");
+
+const weeklyChart = new Chart(weeklyCtx, {
+  type: "bar",
+  data: {
+    labels: [],
+  datasets: [{
+  label: "Weekly Usage",
+  data: [],
+  backgroundColor: [],
+  borderColor: "#1e1e1e",
+  borderWidth: 2,
+  barThickness: 20,  
+  maxBarThickness: 30,
+  }]
+
+  },
+  options: {
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        ticks: { color: "#ccc" },
+        grid: { color: "rgba(255,255,255,0.1)" }
+      },
+      y: {
+        ticks: { color: "#ccc" },
+        grid: { color: "rgba(255,255,255,0.1)" }
+      }
+    }
+  }
+});
+document.getElementById("weeklyChart").addEventListener("click", (evt) => {
+  const points = weeklyChart.getElementsAtEventForMode(
+    evt,
+    "nearest",
+    { intersect: false },
+    false
+  );
+
+  if (!points.length) return;
+
+  const index = points[0].index;
+
+  weeklyChart._expanded[index] = !weeklyChart._expanded[index];
+
+  weeklyChart.data.labels[index] =
+    weeklyChart._expanded[index]
+      ? weeklyChart._fullLabels[index]
+      : weeklyChart._shortLabels[index];
+
+  weeklyChart.update();
+});
+
